@@ -1,0 +1,35 @@
+# Render blueprint — CPC Lab backend (long-running FastAPI engine).
+# The experiment runner uses in-process background threads + persistent SQLite,
+# so the API must run as a container on a host that supports both (Render/Railway/
+# Fly/VPS). Vercel serverless cannot host this part — the Vercel project hosts the
+# Next.js frontend and points NEXT_PUBLIC_API_URL at this service.
+#
+# Deploy: push this repo to GitHub → render.com → New + → Blueprint → select repo.
+services:
+  - type: web
+    name: cpc-lab-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    disk:
+      name: cpc-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:////data/cpc.db
+      - key: DATA_DIR
+        value: /data
+      - key: ADMIN_EMAIL
+        value: admin@cpc.lab
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ALLOW_PUBLIC_REGISTRATION
+        value: "true"
+      # After the Vercel deploy exists, set this to e.g.
+      # https://cpc-lab-<vercel-id>.vercel.app (Dashboard → Environment) and redeploy.
+      - key: CORS_ORIGINS
+        sync: false

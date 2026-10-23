@@ -180,6 +180,23 @@ Both regenerate deterministically: `cd backend && .venv\Scripts\python.exe tools
 - [`docs/research-methodology.md`](docs/research-methodology.md) — evidence policy, measurement rules, reproducibility contract
 - [`docs/deployment.md`](docs/deployment.md) — env vars, migrations, storage backends, workers, security checklist
 
+## Deploying (GitHub → Render API + Vercel frontend)
+
+The stack is split deliberately: **Vercel hosts the Next.js frontend** (its natural home);
+the **FastAPI engine must run on a long-running container host** because it needs background
+threads (experiment runner), a persistent SQLite artifact store, and SSE/polling — serverless
+platforms like Vercel cannot provide those.
+
+1. **Push to GitHub** — `git remote add origin https://github.com/<you>/cpc-lab.git && git push -u origin main`
+2. **API on Render** (or Railway/Fly/VPS): render.com → *New + → Blueprint* → pick the repo
+   → `render.yaml` provisions the Docker backend + 1 GB persistent disk (`/data`) + generated
+   `JWT_SECRET`/admin password. Note the service URL, e.g. `https://cpc-lab-api.onrender.com`.
+   Set `CORS_ORIGINS` to your Vercel URL once known.
+3. **Frontend on Vercel**: vercel.com → Add New → Project → import the repo →
+   **Root Directory: `frontend`** → Environment variable
+   `NEXT_PUBLIC_API_URL=https://cpc-lab-api.onrender.com` → Deploy.
+4. Update `CORS_ORIGINS` on Render with the final `https://<project>.vercel.app` and redeploy.
+
 ## Security model
 
 PBKDF2-SHA256 password hashing · HS256 JWT (`JWT_EXPIRES_MINUTES`, default 12 h) ·
