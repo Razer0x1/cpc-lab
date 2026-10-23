@@ -114,7 +114,10 @@ async function request<T>(path: string, init: RequestInit = {}, retry = true): P
   } catch (err) {
     // Network-level failure: backend unreachable or browser offline.
     setConn("offline");
-    throw new ApiError(0, err instanceof Error && err.message ? err.message : "network unreachable");
+    throw new ApiError(
+      0,
+      "Cannot reach the CPC Lab API — make sure the backend is running on :8000 (run 'CPC Lab (full stack)' from VS Code, F5) or check your connection."
+    );
   }
   setConn("online");
   if (res.status === 401 && retry && typeof window !== "undefined") {
