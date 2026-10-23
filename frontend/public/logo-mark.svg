@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 512" width="580" height="512" role="img" aria-label="CPC Lab">
+  <defs>
+    <linearGradient id="ringGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#18A0FB"/>
+      <stop offset="0.45" stop-color="#4D7CF7"/>
+      <stop offset="1" stop-color="#B02FF5"/>
+    </linearGradient>
+    <linearGradient id="foldGrad" x1="0" y1="1" x2="0.6" y2="0">
+      <stop offset="0" stop-color="#0B57D0"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="meshGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#2FB6F7"/>
+      <stop offset="0.5" stop-color="#3E6FF6"/>
+      <stop offset="1" stop-color="#9333EA"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#818CF8"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+  </defs>
+  <rect width="580" height="512" rx="64" fill="#04060F"/>
+  <path d="M 363.8 368.1 A 178 178 0 1 1 363.8 163.9" fill="none" stroke="url(#ringGrad)" stroke-width="64"/>
+  <path d="M 46 312.1 A 178 178 0 0 1 264.1 94" fill="none" stroke="url(#foldGrad)" stroke-width="60" opacity="0.92"/>
+  <g stroke="url(#meshGrad)" stroke-width="7" fill="none" stroke-linecap="round">
+    <line x1="233" y1="262" x2="233" y2="172"/>
+    <line x1="233" y1="262" x2="176" y2="208"/>
+    <line x1="233" y1="262" x2="290" y2="202"/>
+    <line x1="233" y1="262" x2="155" y2="262"/>
+    <line x1="233" y1="262" x2="308" y2="262"/>
+    <line x1="233" y1="262" x2="172" y2="316"/>
+    <line x1="233" y1="262" x2="288" y2="314"/>
+    <line x1="233" y1="262" x2="236" y2="352"/>
+    <line x1="176" y1="208" x2="288" y2="314"/>
+    <line x1="290" y1="202" x2="172" y2="316"/>
+  </g>
+  <g>
+    <circle cx="233" cy="172" r="24" fill="#3E8BF6"/>
+    <circle cx="176" cy="208" r="21" fill="#4CB4FB"/>
+    <circle cx="290" cy="202" r="21" fill="#7C4DEB"/>
+    <circle cx="155" cy="262" r="23" fill="#2FB6F7"/>
+    <circle cx="308" cy="262" r="21" fill="#9333EA"/>
+    <circle cx="172" cy="316" r="19" fill="#2F7BF0"/>
+    <circle cx="288" cy="314" r="19" fill="#8B2CF0"/>
+    <circle cx="236" cy="352" r="21" fill="#4F63F3"/>
+    <circle cx="233" cy="262" r="29" fill="#3B72F5"/>
+  </g>
+  <rect x="404" y="202" width="20" height="154" rx="10" fill="url(#barGrad)"/>
+  <rect x="440" y="176" width="28" height="206" rx="13" fill="url(#barGrad2)"/>
+</svg>

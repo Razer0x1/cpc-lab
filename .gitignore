@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+/htmlcov
+.coverage
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# Environments & secrets
+.env
+.env.local
+backend/.env
+
+# Data & artifacts (never commit experimental outputs)
+backend/data/
+*.db
+*.sqlite3
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Test fixtures (disposable).
+backend/.test_data/
+
+# Unrelated local directory (not part of CPC Lab; left untouched).
+rea/

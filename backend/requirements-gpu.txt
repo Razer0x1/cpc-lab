@@ -1,0 +1,14 @@
+# OPTIONAL GPU / deep-learning engine dependencies.
+# The platform runs its first research demo on pure NumPy (CPU-only, no install needed).
+# Install this file ONLY when you want real PyTorch/HF training & inference engines:
+#   pip install -r requirements-gpu.txt
+# Keep core requirements installable on CPU-only machines without these packages.
+
+# --extra-index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0
+transformers==4.49.0
+datasets==3.4.0
+peft==0.14.0
+accelerate==1.5.2
+onnxruntime==1.20.1   # swap for onnxruntime-gpu with matching CUDA runtime
+safetensors==0.5.3

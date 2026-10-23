@@ -1,0 +1,35 @@
+# Core API
+fastapi==0.115.14
+uvicorn[standard]==0.34.1
+python-multipart==0.0.20
+
+# Validation & settings
+pydantic==2.10.6
+pydantic-settings==2.7.1
+
+# Persistence
+SQLAlchemy==2.0.38
+alembic==1.14.1
+
+# Research engine (CPU-friendly, no GPU required)
+numpy==2.2.3
+
+# HTTP clients (OpenAlex / arXiv / Crossref / assistant providers)
+httpx==0.28.1
+
+# Auth
+pyjwt==2.10.1
+
+# Async experiments (optional: enable only when running the Redis-backed queue)
+# celery==5.4.0
+# redis==5.2.1
+
+# S3-compatible object storage (optional: used when CPC_STORAGE_BACKEND=s3)
+# boto3==1.36.0
+
+# PDF report export (optional; Markdown/HTML always available)
+# reportlab==4.3.1
+
+# Development / tests
+pytest==8.3.4
+email-validator==2.2.0

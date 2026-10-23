@@ -1,0 +1,7 @@
+# Optional integration extras — installed for full-stack operation.
+# (Storage: S3/MinIO, job queue: Celery+Redis, PostgreSQL driver, PDF export)
+psycopg2-binary==2.9.10
+celery==5.4.0
+redis==5.2.1
+boto3==1.36.0
+reportlab==4.3.1

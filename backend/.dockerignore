@@ -1,0 +1,9 @@
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.test_data
+data
+.env
+tests
+htmlcov

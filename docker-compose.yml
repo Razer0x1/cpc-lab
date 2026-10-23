@@ -1,0 +1,95 @@
+"""CPC Lab stack: Postgres, Redis, API, Celery worker, Next.js frontend.
+
+Development defaults live in .env.example — copy to .env and adjust.
+"""
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cpc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cpcpass}
+      POSTGRES_DB: ${POSTGRES_DB:-cpc}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cpc} -d ${POSTGRES_DB:-cpc}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      ENV: production
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-cpc}:${POSTGRES_PASSWORD:-cpcpass}@postgres:5432/${POSTGRES_DB:-cpc}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@cpc.lab}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      JOB_BACKEND: celery
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      STORAGE_BACKEND: local
+      DATA_DIR: /app/data
+      SCHOLAR_CONTACT_EMAIL: ${SCHOLAR_CONTACT_EMAIL:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - cpc_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["celery", "-A", "app.worker", "worker", "--loglevel", "INFO", "--concurrency", "2"]
+    environment:
+      ENV: production
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-cpc}:${POSTGRES_PASSWORD:-cpcpass}@postgres:5432/${POSTGRES_DB:-cpc}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      STORAGE_BACKEND: local
+      DATA_DIR: /app/data
+    volumes:
+      - cpc_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Where the user's browser reaches the API. For dockerized local use:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  cpc_data:
