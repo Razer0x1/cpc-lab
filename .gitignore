@@ -27,7 +27,11 @@ backend/data/
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # Test fixtures (disposable).
 backend/.test_data/

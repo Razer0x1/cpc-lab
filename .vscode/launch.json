@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend: FastAPI (uvicorn :8000)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--host", "127.0.0.1", "--port", "8000"],
+      "cwd": "${workspaceFolder}/backend",
+      "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+      "env": { "PYTHONUNBUFFERED": "1" },
+      "envFile": "${workspaceFolder}/backend/.env",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Frontend: Next.js dev (:3000)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/frontend",
+      "serverReadyAction": { "pattern": "http://localhost:([0-9]+)", "uriFormat": "http://localhost:%s", "action": "openExternally" }
+    },
+    {
+      "name": "Frontend: Next.js prod (:3000)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run build ; npm start",
+      "cwd": "${workspaceFolder}/frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "CPC Lab (full stack)",
+      "configurations": ["Backend: FastAPI (uvicorn :8000)", "Frontend: Next.js dev (:3000)"],
+      "stopAll": true
+    }
+  ]
+}
