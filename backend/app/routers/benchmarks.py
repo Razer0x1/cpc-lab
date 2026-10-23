@@ -131,24 +131,38 @@ def compare(ctx: WorkspaceCtx = Depends(get_ws_ctx), db: Session = Depends(get_d
     for b in runs:
         m = models.get(b.model_id)
         r = b.result or {}
-        # find experiment summary to tie role baseline/compressed
+        # find experiment summary to tie role baseline/compressed/extracted
         role = "unknown"
         for e in experiments.values():
             s = e.result_summary or {}
-            if s.get("teacher_model_id") == b.model_id:
+            if s.get("teacher_model_id") == b.model_id or s.get("target_model_id") == b.model_id:
                 role = "baseline"
                 break
-            if s.get("student_model_id") == b.model_id or s.get("quantized_model_id") == b.model_id:
+            if (
+                s.get("student_model_id") == b.model_id
+                or s.get("quantized_model_id") == b.model_id
+                or s.get("surrogate_model_id") == b.model_id
+            ):
                 role = "compressed"
                 break
-        # artifact bytes from measured metrics stored in experiment summaries when available
+        # artifact bytes: measured stored-artifact size (works for every registered
+        # model incl. quantized/extraction outputs); fall back to experiment summaries
         artifact_bytes = None
-        for e in experiments.values():
-            s = e.result_summary or {}
-            if s.get("teacher_model_id") == b.model_id:
-                artifact_bytes = (s.get("baseline") or {}).get("artifact_bytes")
-            if s.get("student_model_id") == b.model_id:
-                artifact_bytes = (s.get("compressed") or {}).get("artifact_bytes")
+        if m is not None and m.artifact_uri:
+            art = (
+                db.query(Artifact)
+                .filter_by(workspace_id=ctx.workspace.id, uri=m.artifact_uri)
+                .first()
+            )
+            if art is not None and art.size_bytes:
+                artifact_bytes = art.size_bytes
+        if artifact_bytes is None:
+            for e in experiments.values():
+                s = e.result_summary or {}
+                if s.get("teacher_model_id") == b.model_id:
+                    artifact_bytes = (s.get("baseline") or {}).get("artifact_bytes")
+                if s.get("student_model_id") == b.model_id:
+                    artifact_bytes = (s.get("compressed") or {}).get("artifact_bytes")
         points.append({
             "benchmark_id": b.id, "model_id": b.model_id,
             "model_name": m.name if m else b.model_id,

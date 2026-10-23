@@ -10,7 +10,7 @@ evaluates them statistically, and exports scientific reports.
 > labeled as such (or refuses to run with an explicit error) — the platform never fabricates
 > research results, benchmark scores, or API responses.
 
-![status](https://img.shields.io/badge/tests-49%2F49%20passing-emerald) ![python](https://img.shields.io/badge/python-3.13-skyblue) ![next](https://img.shields.io/badge/next-14.2-blue)
+![status](https://img.shields.io/badge/tests-50%2F50%20passing-emerald) ![python](https://img.shields.io/badge/python-3.13-skyblue) ![next](https://img.shields.io/badge/next-14.2-blue)
 
 ---
 
@@ -63,8 +63,11 @@ openproject/
 │   │   │                  artifact store (SHA-256), papers search, reports, graph
 │   │   └── worker.py      optional Celery worker (Redis broker)
 │   ├── alembic/           migrations (upgrade/downgrade verified)
-│   ├── tests/             49 tests incl. full real-demo lifecycle, quantized-artifact
-│   │                      benchmarking and black-box reverse-engineering extraction
+│   ├── tests/             50 tests incl. full real-demo lifecycle, quantized-artifact
+│   │                      benchmarking, black-box reverse-engineering extraction and
+│   │                      measured Pareto data resolution for extraction outputs
+│   ├── tools/make_figures.py  deterministic SVG figures from the live DB
+│   │                          (measured Pareto chart, provenance graph → docs/figures/)
 │   ├── requirements.txt   pinned runtime deps
 │   ├── requirements-extras.txt   celery, redis, boto3, reportlab, psycopg2 …
 │   └── requirements-gpu.txt      optional torch/HF stack (NOT installed by default)
@@ -156,12 +159,20 @@ Frontend: `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`), optional dev 
 ## Tests
 
 ```bash
-cd backend && .venv\Scripts\python.exe -m pytest tests -q   # 40 passed
+cd backend && .venv\Scripts\python.exe -m pytest tests -q   # 50 passed
 cd frontend && npm run build                                # type-checked build
 ```
 
-The experiment tests run the **actual** NumPy distillation and quantization engines and assert
-measured metric sanity (e.g. student artifact is genuinely smaller than the teacher artifact).
+The experiment tests run the **actual** NumPy distillation, quantization and black-box
+reverse-engineering engines and assert measured metric sanity (e.g. student artifact is
+genuinely smaller than the teacher artifact; surrogate extraction fidelity is bounded).
+
+## Figures (rendered from the live database)
+
+- [`docs/figures/pareto-measured.svg`](docs/figures/pareto-measured.svg) — measured accuracy ↔ artifact-size Pareto chart (all completed benchmark runs)
+- [`docs/figures/provenance-graph.svg`](docs/figures/provenance-graph.svg) — knowledge-graph export (nodes/edges rebuilt from DB)
+
+Both regenerate deterministically: `cd backend && .venv\Scripts\python.exe tools\make_figures.py`
 
 ## Docs
 

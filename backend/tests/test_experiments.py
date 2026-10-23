@@ -41,7 +41,6 @@ def test_create_and_run_distillation_demo(client, auth_headers):
     assert "compression_ratio:measured" in names
     # artifacts exist
     assert any(a["kind"] == "model" for a in body["artifacts"])
-    return exp_id
 
 
 def test_logs_present_and_sequential(client, auth_headers):

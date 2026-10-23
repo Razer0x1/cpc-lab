@@ -57,6 +57,38 @@ def test_reverse_engineering_run_end_to_end(client, auth_headers):
     assert any(("reversed surrogate" in m["name"]) and m["artifact_uri"] for m in models)
 
 
+def test_surrogate_benchmark_resolves_artifact_bytes_and_role(client, auth_headers):
+    """Pareto/tradeoff data must resolve artifact size + role for black-box
+    extraction outputs (regression: surrogate excluded as artifact_bytes=None/unknown)."""
+    from tests.helpers import run_demo
+
+    run_demo(client, auth_headers, "surrogate-pareto-source")
+    models = client.get("/api/v1/workbench/models", headers=auth_headers).json()
+    teacher = next(m for m in models if "teacher" in m["name"] and m["artifact_uri"])
+    r = client.post("/api/v1/workbench/runs", headers=auth_headers, json={
+        "method_key": "reverse_engineering", "name": "re pareto demo",
+        "model_id": teacher["id"], "config": {"query_budget": 2000}, "run_immediately": False,
+    })
+    assert r.status_code == 201, r.text
+    exp_id = r.json()["id"]
+    assert client.post(f"/api/v1/experiments/{exp_id}/run_sync", headers=auth_headers).status_code == 200
+    surrogate_id = client.get(f"/api/v1/experiments/{exp_id}", headers=auth_headers).json()[
+        "result_summary"]["surrogate_model_id"]
+
+    r = client.post("/api/v1/benchmarks/run", headers=auth_headers, json={
+        "model_id": surrogate_id, "task": "synthetic_classification", "seed": 13, "n_repeats": 3,
+    })
+    assert r.status_code == 201, r.text
+
+    c = client.get("/api/v1/benchmarks/compare", headers=auth_headers).json()
+    rows = {t["model_id"]: t for t in c["tradeoffs"]}
+    row = rows[surrogate_id]
+    assert row["artifact_bytes"] is not None and row["artifact_bytes"] > 0
+    assert row["role"] == "compressed"
+    assert isinstance(row["on_pareto_front"], bool)
+    assert row["quality"] is not None
+
+
 def test_reverse_engineering_config_validation(client, auth_headers):
     teacher_id, _ = _setup_teacher(client, auth_headers, "re-validation-source")
     r = client.post("/api/v1/workbench/runs", headers=auth_headers, json={
