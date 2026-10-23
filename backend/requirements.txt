@@ -10,6 +10,7 @@ pydantic-settings==2.7.1
 # Persistence
 SQLAlchemy==2.0.38
 alembic==1.14.1
+psycopg2-binary==2.9.10
 
 # Research engine (CPU-friendly, no GPU required)
 numpy==2.2.3

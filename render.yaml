@@ -1,8 +1,12 @@
 # Render blueprint — CPC Lab backend (long-running FastAPI engine).
-# The experiment runner uses in-process background threads + persistent SQLite,
-# so the API must run as a container on a host that supports both (Render/Railway/
-# Fly/VPS). Vercel serverless cannot host this part — the Vercel project hosts the
-# Next.js frontend and points NEXT_PUBLIC_API_URL at this service.
+# The experiment runner uses in-process background threads, so the API must run as
+# a container on a host that supports them (Render/Railway/Fly/VPS). Vercel
+# serverless cannot host this part — the Vercel project hosts the Next.js frontend
+# and points NEXT_PUBLIC_API_URL at this service.
+#
+# Data: the free Render tier has no persistent disk, so state lives in a free
+# hosted Postgres (e.g. Neon) via DATABASE_URL. Only generated artifact files in
+# DATA_DIR are per-instance/ephemeral; every measurement lives in the database.
 #
 # Deploy: push this repo to GitHub → render.com → New + → Blueprint → select repo.
 services:
@@ -12,15 +16,12 @@ services:
     dockerfilePath: ./backend/Dockerfile
     plan: free
     healthCheckPath: /health
-    disk:
-      name: cpc-data
-      mountPath: /data
-      sizeGB: 1
     envVars:
+      #postgresql://<user>:<password>@<host>/<db>?sslmode=require  (Neon/Supabase)
       - key: DATABASE_URL
-        value: sqlite:////data/cpc.db
+        sync: false
       - key: DATA_DIR
-        value: /data
+        value: /app/data
       - key: ADMIN_EMAIL
         value: admin@cpc.lab
       - key: ADMIN_PASSWORD
